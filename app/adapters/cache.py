@@ -6,7 +6,9 @@ from app.services.data_loader import load_all_data
 
 class DataCache:
     def __init__(self, cache_file='./data/cache.json'):
-        self.cache_file = cache_file
+        # Use /tmp for Vercel (read-only filesystem elsewhere)
+        default_cache_path = '/tmp/cache.json' if os.environ.get("VERCEL") else './data/cache.json'
+        self.cache_file = cache_file or default_cache_path
         self.cache_duration = timedelta(hours=1)  # Cache for 1 hour
     
     def get_cached_data(self):
