@@ -21,3 +21,5 @@ def create_app():
     
     return app
 
+# Create the app instance that Vercel will look for
+app = create_app()
