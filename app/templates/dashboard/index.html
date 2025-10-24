@@ -1,0 +1,234 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Kixie Powerlist RCA Dashboard</h1>
+    </div>
+</div>
+
+<!-- Baseline Metrics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h3>Baseline Metrics</h3>
+        <p class="text-muted">Pre-change performance metrics</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Connect Rate</h5>
+                <div class="metric-value text-primary">
+                    {{ baseline_metrics.get('connect_rate', 0) }}%
+                </div>
+                <p class="metric-subtitle">
+                    {{ baseline_metrics.get('connected_calls', 0) }} / {{ baseline_metrics.get('total_calls', 0) }} calls
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Answer Event %</h5>
+                <div class="metric-value text-info">
+                    {{ baseline_metrics.get('answer_event_pct', 0) }}%
+                </div>
+                <p class="metric-subtitle">Approximated visibility</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Avg Attempts Lost-Race</h5>
+                <div class="metric-value text-warning">
+                    {{ baseline_metrics.get('avg_attempts_lost_race', 0) }}
+                </div>
+                <p class="metric-subtitle">Per contact</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Cooldown / Day</h5>
+                <div class="metric-value text-danger">
+                    {{ baseline_metrics.get('cooldown_per_day', 0) }}
+                </div>
+                <p class="metric-subtitle">Contacts hitting max attempts</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pilot Metrics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h3>Pilot Metrics (NAICS Powerlist)</h3>
+        <p class="text-muted">Expected performance with optimized settings</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Sample Size</h5>
+                <div class="metric-value text-success">
+                    {{ pilot_metrics.get('sample_size', 0) }}
+                </div>
+                <p class="metric-subtitle">Unique contacts</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Target Connect Rate</h5>
+                <div class="metric-value text-primary">
+                    {{ pilot_metrics.get('target_connect_rate', 0) }}%
+                </div>
+                <p class="metric-subtitle">+{{ pilot_metrics.get('target_connect_uplift_pct', 0) }}% vs baseline</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Success Criteria</h5>
+                <div class="metric-value text-info">
+                    {{ pilot_metrics.get('success_connect_uplift_pct', 0) }}%
+                </div>
+                <p class="metric-subtitle">Min connect rate uplift</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Test Duration</h5>
+                <div class="metric-value text-warning">
+                    {{ pilot_metrics.get('test_duration_days', 0) }}
+                </div>
+                <p class="metric-subtitle">Business days</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Hygiene Metrics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h3>Data Hygiene</h3>
+        <p class="text-muted">Phone validation and quality metrics</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Validated</h5>
+                <div class="metric-value text-primary">
+                    {{ validation_metrics.get('total_validated', 0) }}
+                </div>
+                <p class="metric-subtitle">Phone numbers</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Reachable</h5>
+                <div class="metric-value text-success">
+                    {{ validation_metrics.get('reachable_count', 0) }}
+                </div>
+                <p class="metric-subtitle">{{ "%.1f"|format((validation_metrics.get('reachable_count', 0) / validation_metrics.get('total_validated', 1) * 100) if validation_metrics.get('total_validated', 0) > 0 else 0) }}% of total</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Invalid</h5>
+                <div class="metric-value text-danger">
+                    {{ validation_metrics.get('invalid_count', 0) }}
+                </div>
+                <p class="metric-subtitle">{{ validation_metrics.get('invalid_pct', 0) }}% of total</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Validated & Dialed</h5>
+                <div class="metric-value text-info">
+                    {{ validation_metrics.get('validated_dialed_count', 0) }}
+                </div>
+                <p class="metric-subtitle">{{ validation_metrics.get('validated_dialed_pct', 0) }}% of validated</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cooldown Metrics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h3>Reattempt/Cooldown</h3>
+        <p class="text-muted">Cooldown management and reattempt potential</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Cooldown Contacts</h5>
+                <div class="metric-value text-warning">
+                    {{ cooldown_metrics.get('cooldown_contacts_count', 0) }}
+                </div>
+                <p class="metric-subtitle">At max attempts</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Reattempt Potential</h5>
+                <div class="metric-value text-success">
+                    {{ cooldown_metrics.get('reattempt_potential', 0) }}
+                </div>
+                <p class="metric-subtitle">Expected successful recontacts</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card metric-card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Target KPI</h5>
+                <div class="metric-value text-primary">
+                    {{ cooldown_metrics.get('target_kpi', 0) }}%
+                </div>
+                <p class="metric-subtitle">Success rate target</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Phone ID Live Reminder -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h5 class="alert-heading">📋 Phone ID Live Status Logging Plan</h5>
+            <p class="mb-0">
+                Remember to log "Phone ID Live Status" as a HubSpot property for all contacts. 
+                This will help track validation effectiveness and improve future targeting.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

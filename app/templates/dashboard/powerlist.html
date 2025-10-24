@@ -1,0 +1,128 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Powerlist Analytics</h1>
+        <p class="text-muted">Detailed analysis of powerlist performance and cooldown management</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Filter by Powerlist</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET">
+                    <div class="mb-3">
+                        <select name="list_name" class="form-select" onchange="this.form.submit()">
+                            <option value="">All Powerlists</option>
+                            {% for list_name in available_lists %}
+                            <option value="{{ list_name }}" {% if list_name == selected_list %}selected{% endif %}>
+                                {{ list_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attempt Distribution -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Attempt Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="attemptChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cooldown Feed -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Cooldown Feed</h5>
+            </div>
+            <div class="card-body">
+                {% if cooldown_feed %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Phone Number</th>
+                                <th>List Name</th>
+                                <th>Attempt Count</th>
+                                <th>Cooldown Start</th>
+                                <th>Cooldown End</th>
+                                <th>Owner</th>
+                                <th>Review Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in cooldown_feed %}
+                            <tr>
+                                <td>{{ contact.phone_number }}</td>
+                                <td>{{ contact.list_name }}</td>
+                                <td>{{ contact.attempt_count }}</td>
+                                <td>{{ contact.cooldown_start }}</td>
+                                <td>{{ contact.cooldown_end }}</td>
+                                <td>{{ contact.owner }}</td>
+                                <td>{{ contact.review_date }}</td>
+                                <td>
+                                    <span class="badge bg-warning">{{ contact.status }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No contacts currently in cooldown.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Attempt Distribution Chart
+const attemptCtx = document.getElementById('attemptChart').getContext('2d');
+const attemptChart = new Chart(attemptCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ attempt_distribution.get('attempt_counts', []) | tojson }},
+        datasets: [{
+            label: 'Number of Contacts',
+            data: {{ attempt_distribution.get('contact_counts', []) | tojson }},
+            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+

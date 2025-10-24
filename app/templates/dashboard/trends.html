@@ -1,0 +1,128 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Weekly Trends</h1>
+        <p class="text-muted">Call volume and disposition trends over time</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Call Volume Trends</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="callVolumeChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Disposition Breakdown</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="dispositionChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Call Volume Chart
+const callVolumeCtx = document.getElementById('callVolumeChart').getContext('2d');
+const callVolumeChart = new Chart(callVolumeCtx, {
+    type: 'line',
+    data: {
+        labels: {{ weekly_trends.get('weeks', []) | tojson }},
+        datasets: [
+            {
+                label: 'Total Calls',
+                data: {{ weekly_trends.get('total_calls', []) | tojson }},
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            },
+            {
+                label: 'Connected',
+                data: {{ weekly_trends.get('connected_calls', []) | tojson }},
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                tension: 0.1
+            },
+            {
+                label: 'Voicemail',
+                data: {{ weekly_trends.get('voicemail_calls', []) | tojson }},
+                borderColor: 'rgb(255, 205, 86)',
+                backgroundColor: 'rgba(255, 205, 86, 0.2)',
+                tension: 0.1
+            },
+            {
+                label: 'No Answer',
+                data: {{ weekly_trends.get('no_answer_calls', []) | tojson }},
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                tension: 0.1
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Disposition Chart
+const dispositionCtx = document.getElementById('dispositionChart').getContext('2d');
+const dispositionChart = new Chart(dispositionCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ weekly_trends.get('weeks', []) | tojson }},
+        datasets: [
+            {
+                label: 'Connected',
+                data: {{ weekly_trends.get('connected_calls', []) | tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.8)'
+            },
+            {
+                label: 'Voicemail',
+                data: {{ weekly_trends.get('voicemail_calls', []) | tojson }},
+                backgroundColor: 'rgba(255, 205, 86, 0.8)'
+            },
+            {
+                label: 'No Answer',
+                data: {{ weekly_trends.get('no_answer_calls', []) | tojson }},
+                backgroundColor: 'rgba(255, 99, 132, 0.8)'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                stacked: true
+            },
+            y: {
+                stacked: true,
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+

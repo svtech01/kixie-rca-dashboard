@@ -1,0 +1,13 @@
+phone_e164,is_reachable,risk_level,carrier,validation_type
++1234567890,Yes,Low,Verizon,Phone ID Live
++0987654321,Yes,Low,AT&T,Phone ID Live
++5555555555,No,High,Unknown,Phone ID Live
++1111111111,Yes,Medium,T-Mobile,Phone ID Live
++2222222222,Yes,Low,Sprint,Phone ID Live
++3333333333,Yes,Low,Verizon,Phone ID Live
++4444444444,No,High,Unknown,Phone ID Live
++5555555556,Yes,Medium,AT&T,Phone ID Live
++6666666666,Yes,Low,T-Mobile,Phone ID Live
++7777777777,No,High,Unknown,Phone ID Live
++8888888888,Yes,Low,Sprint,Phone ID Live
++9999999999,Yes,Medium,Verizon,Phone ID Live

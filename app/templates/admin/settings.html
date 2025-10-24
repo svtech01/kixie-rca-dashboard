@@ -1,0 +1,223 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Admin Settings</h1>
+        <p class="text-muted">Configure dashboard settings and manage data files</p>
+    </div>
+</div>
+
+<!-- Settings Form -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Configuration Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.update_settings') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="dial_at_a_time" class="form-label">Dial at a Time</label>
+                                <input type="number" class="form-control" id="dial_at_a_time" name="dial_at_a_time" 
+                                       value="{{ settings.dial_at_a_time }}" min="1" max="10">
+                                <div class="form-text">Number of simultaneous dials (1-2 for pilot)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="max_attempts" class="form-label">Max Attempts</label>
+                                <input type="number" class="form-control" id="max_attempts" name="max_attempts" 
+                                       value="{{ settings.max_attempts }}" min="1" max="50">
+                                <div class="form-text">Maximum attempts per contact</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="attempts_per_day" class="form-label">Attempts per Day</label>
+                                <input type="number" class="form-control" id="attempts_per_day" name="attempts_per_day" 
+                                       value="{{ settings.attempts_per_day }}" min="1" max="10">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="cooldown_days" class="form-label">Cooldown Days</label>
+                                <input type="number" class="form-control" id="cooldown_days" name="cooldown_days" 
+                                       value="{{ settings.cooldown_days }}" min="1" max="30">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="pilot_list_name" class="form-label">Pilot List Name</label>
+                                <input type="text" class="form-control" id="pilot_list_name" name="pilot_list_name" 
+                                       value="{{ settings.pilot_list_name }}">
+                                <div class="form-text">Substring to filter pilot lists</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="timezone" class="form-label">Timezone</label>
+                                <select class="form-select" id="timezone" name="timezone">
+                                    <option value="Asia/Manila" {% if settings.timezone == 'Asia/Manila' %}selected{% endif %}>Asia/Manila</option>
+                                    <option value="UTC" {% if settings.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                                    <option value="America/New_York" {% if settings.timezone == 'America/New_York' %}selected{% endif %}>America/New_York</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="target_connect_uplift_pct" class="form-label">Target Connect Uplift %</label>
+                                <input type="number" class="form-control" id="target_connect_uplift_pct" name="target_connect_uplift_pct" 
+                                       value="{{ settings.target_connect_uplift_pct }}" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="success_connect_uplift_pct" class="form-label">Success Connect Uplift %</label>
+                                <input type="number" class="form-control" id="success_connect_uplift_pct" name="success_connect_uplift_pct" 
+                                       value="{{ settings.success_connect_uplift_pct }}" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="success_voicemail_uplift_pct" class="form-label">Success Voicemail Uplift %</label>
+                                <input type="number" class="form-control" id="success_voicemail_uplift_pct" name="success_voicemail_uplift_pct" 
+                                       value="{{ settings.success_voicemail_uplift_pct }}" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Update Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data Files Status -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Data Files Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Kixie Call History</span>
+                        <span class="badge bg-{{ 'success' if data_files.kixie else 'danger' }}">
+                            {{ 'Loaded' if data_files.kixie else 'Missing' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Telesign (With Live)</span>
+                        <span class="badge bg-{{ 'success' if data_files.telesign_with else 'danger' }}">
+                            {{ 'Loaded' if data_files.telesign_with else 'Missing' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Telesign (Without Live)</span>
+                        <span class="badge bg-{{ 'success' if data_files.telesign_without else 'danger' }}">
+                            {{ 'Loaded' if data_files.telesign_without else 'Missing' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Powerlist Contacts</span>
+                        <span class="badge bg-{{ 'success' if data_files.powerlist else 'danger' }}">
+                            {{ 'Loaded' if data_files.powerlist else 'Missing' }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin.refresh_data') }}" class="btn btn-outline-primary btn-sm">
+                        Refresh Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Upload -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Upload Data Files</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.upload_file') }}" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Select File</label>
+                                <input type="file" class="form-control" id="file" name="file" accept=".csv">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="file_type" class="form-label">File Type</label>
+                                <select class="form-select" id="file_type" name="file_type" required>
+                                    <option value="">Select file type...</option>
+                                    <option value="kixie">Kixie Call History</option>
+                                    <option value="telesign_with">Telesign (With Live)</option>
+                                    <option value="telesign_without">Telesign (Without Live)</option>
+                                    <option value="powerlist">Powerlist Contacts</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Upload File</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Options -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Export Options</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{{ url_for('admin.export_summary') }}" class="btn btn-outline-primary">
+                        Export Summary PDF
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="exportToCSV()">
+                        Export Current View to CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function exportToCSV() {
+    // This would implement CSV export functionality
+    alert('CSV export functionality would be implemented here');
+}
+</script>
+{% endblock %}
+

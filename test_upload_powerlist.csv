@@ -1,0 +1,13 @@
+Phone Number,Connected,Attempt Count,List Name
++1234567890,1,8,NAICS Manufacturing
++0987654321,1,5,NAICS Technology
++5555555555,0,18,Other List
++1111111111,1,3,NAICS Healthcare
++2222222222,0,12,Other List
++3333333333,1,7,NAICS Finance
++4444444444,0,25,Other List
++5555555556,1,9,NAICS Retail
++6666666666,0,30,Other List
++7777777777,0,22,Other List
++8888888888,1,4,NAICS Services
++9999999999,0,15,Other List

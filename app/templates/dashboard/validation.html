@@ -1,0 +1,190 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Validation Cross-Reference</h1>
+        <p class="text-muted">Cross-reference between validated numbers and dialed contacts</p>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Validated & Dialed</h5>
+                <div class="display-6 text-primary">{{ cross_ref_data.get('validated_dialed', {}).get('count', 0) }}</div>
+                <p class="text-muted">Numbers both validated and dialed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Validated Only</h5>
+                <div class="display-6 text-info">{{ cross_ref_data.get('validated_only', {}).get('count', 0) }}</div>
+                <p class="text-muted">Validated but not dialed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Dialed Only</h5>
+                <div class="display-6 text-warning">{{ cross_ref_data.get('dialed_only', {}).get('count', 0) }}</div>
+                <p class="text-muted">Dialed but not validated</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">False Negatives</h5>
+                <div class="display-6 text-danger">{{ cross_ref_data.get('false_negatives', {}).get('count', 0) }}</div>
+                <p class="text-muted">Connected despite validation failure</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Carrier Performance -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Carrier Performance</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="carrierChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Tables -->
+<div class="row">
+    <!-- Validated & Dialed -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Validated & Dialed</h5>
+            </div>
+            <div class="card-body">
+                {% if cross_ref_data.get('validated_dialed', {}).get('data') %}
+                <div class="table-responsive" style="max-height: 400px;">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Phone</th>
+                                <th>List</th>
+                                <th>Reachable</th>
+                                <th>Carrier</th>
+                                <th>Disposition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in cross_ref_data.get('validated_dialed', {}).get('data', [])[:10] %}
+                            <tr>
+                                <td>{{ contact.get('Phone Number', '') }}</td>
+                                <td>{{ contact.get('List Name', '') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if contact.get('is_reachable') == 'Yes' else 'danger' }}">
+                                        {{ contact.get('is_reachable', '') }}
+                                    </span>
+                                </td>
+                                <td>{{ contact.get('carrier', '') }}</td>
+                                <td>{{ contact.get('Disposition', '') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- False Negatives -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">False Negatives</h5>
+            </div>
+            <div class="card-body">
+                {% if cross_ref_data.get('false_negatives', {}).get('data') %}
+                <div class="table-responsive" style="max-height: 400px;">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Phone</th>
+                                <th>List</th>
+                                <th>Reachable</th>
+                                <th>Disposition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in cross_ref_data.get('false_negatives', {}).get('data', [])[:10] %}
+                            <tr>
+                                <td>{{ contact.get('Phone Number', '') }}</td>
+                                <td>{{ contact.get('List Name', '') }}</td>
+                                <td>
+                                    <span class="badge bg-danger">{{ contact.get('is_reachable', '') }}</span>
+                                </td>
+                                <td>{{ contact.get('Disposition', '') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No false negatives found</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Carrier Performance Chart
+const carrierCtx = document.getElementById('carrierChart').getContext('2d');
+const carrierData = {{ cross_ref_data.get('carrier_summary', {}) | tojson }};
+
+const carriers = Object.keys(carrierData);
+const totalValidated = carriers.map(carrier => carrierData[carrier].total_validated || 0);
+const reachableCount = carriers.map(carrier => carrierData[carrier].reachable_count || 0);
+
+const carrierChart = new Chart(carrierCtx, {
+    type: 'bar',
+    data: {
+        labels: carriers,
+        datasets: [
+            {
+                label: 'Total Validated',
+                data: totalValidated,
+                backgroundColor: 'rgba(54, 162, 235, 0.8)'
+            },
+            {
+                label: 'Reachable',
+                data: reachableCount,
+                backgroundColor: 'rgba(75, 192, 192, 0.8)'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+

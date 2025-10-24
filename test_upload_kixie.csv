@@ -1,0 +1,11 @@
+Date,Time,Agent First Name,Agent Last Name,Status,Disposition,Duration,Source,To Number
+2024-01-17,09:15:30,Mike,Johnson,Completed,Connected,200,Kixie,+1234567890
+2024-01-17,09:20:15,Sarah,Wilson,Completed,Left voicemail,60,Kixie,+0987654321
+2024-01-17,09:25:45,Mike,Johnson,Completed,No Answer,0,Kixie,+5555555555
+2024-01-17,09:30:20,Sarah,Wilson,Completed,Connected,150,Kixie,+1111111111
+2024-01-17,09:35:10,Mike,Johnson,Completed,Left voicemail,80,Kixie,+2222222222
+2024-01-17,10:15:30,Sarah,Wilson,Completed,No Answer,0,Kixie,+1234567890
+2024-01-17,10:20:15,Mike,Johnson,Completed,Connected,220,Kixie,+0987654321
+2024-01-17,10:25:45,Sarah,Wilson,Completed,Busy,0,Kixie,+5555555555
+2024-01-17,10:30:20,Mike,Johnson,Completed,Left voicemail,70,Kixie,+1111111111
+2024-01-17,10:35:10,Sarah,Wilson,Completed,Connected,190,Kixie,+2222222222
