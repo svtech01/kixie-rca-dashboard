@@ -58,8 +58,14 @@ def upload_file():
         return redirect(url_for('admin.admin'))
     
     if file and file_type:
+
+        # Use /tmp since it's the only writable directory on Vercel
+        default_tmp_dir = './data' if os.environ.get("VERCEL") else '/tmp'
+        tmp_dir = default_tmp_dir
+        os.makedirs(tmp_dir, exist_ok=True)
+
         # Create data directory if it doesn't exist
-        os.makedirs('./data', exist_ok=True)
+        # os.makedirs('./data', exist_ok=True)
         
         # Determine filename based on file type
         filename_map = {
@@ -70,7 +76,8 @@ def upload_file():
         }
         
         filename = filename_map.get(file_type, secure_filename(file.filename))
-        filepath = os.path.join('./data', filename)
+        # filepath = os.path.join('./data', filename)
+        filepath = os.path.join(tmp_dir, filename)
         
         # Validate CSV format before saving
         try:
