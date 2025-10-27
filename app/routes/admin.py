@@ -60,7 +60,7 @@ def upload_file():
     if file and file_type:
 
         # Use /tmp since it's the only writable directory on Vercel
-        default_tmp_dir = './data' if os.environ.get("VERCEL") else '/tmp'
+        default_tmp_dir = '/tmp' if os.environ.get("VERCEL") else './data'
         tmp_dir = default_tmp_dir
         os.makedirs(tmp_dir, exist_ok=True)
 
