@@ -11,70 +11,36 @@ class DataCache:
         self.cache_file = cache_file or default_cache_path
         self.cache_duration = timedelta(hours=1)  # Cache for 1 hour
 
-    def get_cached_datax(self):
-        """
-        Get cached data if it exists and is not expired.
-        """
-        if not os.path.exists(self.cache_file):
-            return None
-
-        try:
-            with open(self.cache_file, 'r') as f:
-                cache_data = json.load(f)
-
-            cache_time = datetime.fromisoformat(cache_data['timestamp'])
-            if datetime.now() - cache_time > self.cache_duration:
-                return None
-
-            # Convert cached data back to pandas DataFrames
-            data = cache_data['data']
-            data['kixie'] = pd.DataFrame(data['kixie']) if data.get('kixie') else pd.DataFrame()
-            data['powerlist'] = pd.DataFrame(data['powerlist']) if data.get('powerlist') else pd.DataFrame()
-            data['telesign'] = pd.DataFrame(data['telesign']) if data.get('telesign') else pd.DataFrame()
-
-            if data.get('last_updated'):
-                data['last_updated'] = datetime.fromisoformat(data['last_updated'])
-
-            return data
-        except (json.JSONDecodeError, KeyError, ValueError, TypeError):
-            return None
-        
     def get_cached_data(self):
         """
         Get cached data if it exists and is not expired.
         """
         if not os.path.exists(self.cache_file):
             return None
-
+        
         try:
             with open(self.cache_file, 'r') as f:
                 cache_data = json.load(f)
-
+            
             cache_time = datetime.fromisoformat(cache_data['timestamp'])
             if datetime.now() - cache_time > self.cache_duration:
                 return None
-
+            
             # Convert cached data back to pandas DataFrames
             data = cache_data['data']
-            data['kixie'] = pd.DataFrame(data['kixie']) if data.get('kixie') else pd.DataFrame()
-            data['powerlist'] = pd.DataFrame(data['powerlist']) if data.get('powerlist') else pd.DataFrame()
-            data['telesign'] = pd.DataFrame(data['telesign']) if data.get('telesign') else pd.DataFrame()
-
-            # Restore datetime types where applicable
-            for key in ['kixie', 'telesign', 'powerlist']:
-                df = data.get(key)
-                if isinstance(df, pd.DataFrame) and not df.empty:
-                    for col in df.columns:
-                        if 'date' in col.lower() or 'time' in col.lower() or col.lower() == 'datetime':
-                            df[col] = pd.to_datetime(df[col], errors='coerce')
-
-            # Restore last updated timestamp
-            if data.get('last_updated'):
+            if 'kixie' in data and isinstance(data['kixie'], list):
+                data['kixie'] = pd.DataFrame(data['kixie']) if data['kixie'] else pd.DataFrame()
+            if 'powerlist' in data and isinstance(data['powerlist'], list):
+                data['powerlist'] = pd.DataFrame(data['powerlist']) if data['powerlist'] else pd.DataFrame()
+            if 'telesign' in data and isinstance(data['telesign'], list):
+                data['telesign'] = pd.DataFrame(data['telesign']) if data['telesign'] else pd.DataFrame()
+            
+            # Convert last_updated back to datetime
+            if 'last_updated' in data and data['last_updated']:
                 data['last_updated'] = datetime.fromisoformat(data['last_updated'])
-
+            
             return data
-
-        except (json.JSONDecodeError, KeyError, ValueError, TypeError):
+        except (json.JSONDecodeError, KeyError, ValueError):
             return None
 
     def cache_data(self, data):
